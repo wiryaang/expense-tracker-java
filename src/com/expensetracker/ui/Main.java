@@ -8,10 +8,28 @@ import com.expensetracker.model.Expense;
 import java.util.List;
 import java.util.Scanner;
 import java.util.Map;
+import java.sql.Connection;
+import java.sql.Statement;
+import com.expensetracker.dc.DatabaseConnection;
 public class Main {
     public static void main(String[] args){
         ExpenseService service = new ExpenseService();
         Scanner scanner = new Scanner(System.in);
+        
+        try(Connection conn = DatabaseConnection.connect();
+                Statement stmt = conn.createStatement()){
+            
+            String sql = "CREATE TABLE IF NOT EXISTS expenses (" +
+                         "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                         "amount REAL, " +
+                         "category TEXT, " +
+                         "date TEXT, "  +
+                         "note TEXT" +
+                         ");";
+            stmt.execute(sql);
+        } catch (Exception e){
+            e.printStackTrace();
+        }
         
         while(true){
             System.out.println("\n=== Expense Tracker ===");
@@ -58,7 +76,7 @@ public class Main {
                     }
                 }
             } else if (choice == 3){
-                System.out.println("Enter ID to delet: ");
+                System.out.println("Enter ID to delete: ");
                 int id = scanner.nextInt();
                 service.deleteExpense(id);
                 System.out.println("Deleted (if ID existed).");
