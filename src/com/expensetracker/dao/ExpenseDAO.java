@@ -60,4 +60,19 @@ public class ExpenseDAO {
             e.printStackTrace();
         }
     }
+    public void createTableIfNotExists(){
+        String sql = "CREATE TABLE IF NOT EXISTS expenses ("
+                + "id INTEGER PRIMARY KEY AUTOINCREMENT,"
+                + "amount REAL,"
+                + "category TEXT,"
+                + "date TEXT,"
+                + "note TEXT"
+                + ");";
+        try(Connection conn = DatabaseConnection.connect();
+                Statement stmt = conn.createStatement()){
+            stmt.execute(sql);
+        } catch(SQLException e){
+            e.printStackTrace();
+        }
+    }
 }

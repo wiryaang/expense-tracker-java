@@ -14,6 +14,7 @@ private ExpenseDAO dao = new ExpenseDAO();
 private DefaultTableModel tableModel;
     public MainFrame() {
         initComponents();
+        dao.createTableIfNotExists();
     tableModel = new DefaultTableModel(
     new String[]{"ID", "Amount", "Category", "Date", "Note"},0
     );
@@ -23,7 +24,7 @@ private DefaultTableModel tableModel;
 }
 private void loadExpenses(){
     tableModel.setRowCount(0);
-        
+        double total = 0;
     for (Expense e: dao.getAllExpenses()){
         tableModel.addRow(new Object[]{
             e.getId(),
@@ -32,8 +33,9 @@ private void loadExpenses(){
             e.getDate(),
             e.getNote()
             }); 
-            
+            total += e.getAmount();
         }
+    lblTotal.setText("Total: Rp"+ total);
     }
     
     
@@ -58,6 +60,7 @@ private void loadExpenses(){
         AddExpense = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
         tableExpenses = new javax.swing.JTable();
+        lblTotal = new javax.swing.JLabel();
         jLabel1 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -146,6 +149,10 @@ private void loadExpenses(){
 
         getContentPane().add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 290, 840, 300));
 
+        lblTotal.setFont(new java.awt.Font("Harrington", 1, 18)); // NOI18N
+        lblTotal.setText("Total: Rp 0");
+        getContentPane().add(lblTotal, new org.netbeans.lib.awtextra.AbsoluteConstraints(750, 220, 240, 40));
+
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/expensetracker/ui/Slide 4_3 - 1.png"))); // NOI18N
         jLabel1.setText("jLabel1");
         jLabel1.setMaximumSize(new java.awt.Dimension(1000, 600));
@@ -182,19 +189,26 @@ private void loadExpenses(){
         String keyword = Filter.getText().toLowerCase();
         
         tableModel.setRowCount(0);
-        
-        for(Expense e : dao.getAllExpenses()){
-            if(e.getCategory().toLowerCase().contains(keyword)){
-                tableModel.addRow(new Object[]{
-                e.getId(),
-                e.getAmount(),
-                e.getCategory(),
-                e.getDate(),
-                e.getNote()
-                     
-                        });
+        double total = 0;
+        for (Expense e : dao.getAllExpenses()){
+            String date = e.getDate().toLowerCase().trim();
+            String category = e.getCategory().toLowerCase();
+            String yearMonth = "";
+            if(date.length()>=7){
+              yearMonth = date.substring(0,7);
             }
-        }
+            if(yearMonth.equals(keyword)||category.contains(keyword)|| date.contains(keyword)){
+                tableModel.addRow(new Object[]{
+                    e.getId(),
+                    e.getAmount(),
+                    e.getCategory(),
+                    e.getDate(),
+                    e.getNote()
+                });
+                total += e.getAmount();
+                }
+            }
+        lblTotal.setText("Total: Rp "+ total);
     }//GEN-LAST:event_ApplyActionPerformed
 
     private void ResetActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ResetActionPerformed
@@ -264,6 +278,7 @@ private void loadExpenses(){
     private javax.swing.JButton SortByAmount;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JLabel lblTotal;
     private javax.swing.JTable tableExpenses;
     // End of variables declaration//GEN-END:variables
 }
