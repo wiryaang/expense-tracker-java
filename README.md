@@ -1,95 +1,148 @@
-# 📊 Expense Tracker (Java + Swing + SQLite)
+# Expense Tracker (Java)
 
-A simple desktop application built with Java Swing to track personal expenses.  
-This project demonstrates GUI design, data handling, and database integration.
+## Project Description
+
+Expense Tracker is a Java desktop application developed using Java Swing and SQLite. The system allows users to record, organize, search, sort, and analyze personal expenses. The application demonstrates object-oriented programming concepts, data structures, algorithms, database connectivity, and file input/output implementation.
+
+This project is being developed as a Java final project and follows a layered architecture design:
+
+UI → Service → DAO → SQLite Database
 
 ---
 
-## 🚀 Features
+## Features
 
-- Add new expenses (amount, category, date, note)
-- View all expenses in a table
-- Delete selected expenses
-- Filter expenses by category
+### Expense Management
+- Add new expense records
+- Delete expense records
+- View expenses in a JTable
+- Display total expenses
+- Filter expenses by:
+  - Category
+  - Date
+  - Month (YYYY-MM)
+
+### Search and Sorting
+- Linear Search implementation
+- Insertion Sort implementation
 - Sort expenses by amount
-- Persistent storage using SQLite (data is saved after closing the app)
+- Search by category and date
+
+### Data Structures
+- ArrayList used for expense storage and manipulation
+- HashMap used for category-based expense totals
+
+### Database
+- SQLite database integration
+- Automatic table creation if database does not exist
+- Persistent data storage
+
+### File Input / Output
+- Export expenses into text files
+- Import expenses from text files
+- Data persistence between sessions
 
 ---
 
-## 🛠️ Technologies Used
+## Object-Oriented Programming Concepts
 
-- Java (JDK 17)
-- Java Swing (GUI)
-- SQLite (Database)
-- JDBC (Database connection)
+### Inheritance
+Implemented using:
+
+- Expense
+- FoodExpense extends Expense
+- TransportExpense extends Expense
+
+### Polymorphism
+Method overriding through:
+
+```java
+generateReport()
+```
+
+### Abstraction
+Implemented using interface:
+
+```java
+Reportable
+```
+
+---
+
+## Algorithms Implemented
+
+### Linear Search
+Searches through expense records based on:
+
+- Category
+- Date
+- Month
+
+Time Complexity:
+
+```text
+O(n)
+```
+
+### Insertion Sort
+Sorts expenses by amount.
+
+Time Complexity:
+
+```text
+O(n²)
+```
+
+---
+
+## Technologies Used
+
+- Java
+- Java Swing
+- SQLite JDBC
 - NetBeans IDE
 
 ---
 
-## 📂 Project Structure
+## Current Project Structure
 
-- `model` → Expense data class  
-- `dao` → Database operations (ExpenseDAO)  
-- `dc` → Database connection  
-- `service` → Business logic (optional)  
-- `ui` → User interface (MainFrame)  
-
----
-
-## 🧠 How It Works
-
-- The GUI interacts with `ExpenseDAO`
-- `ExpenseDAO` handles database operations (CRUD)
-- Data is stored in a local SQLite database (`expenses.db`)
-- JTable updates dynamically after each action
-
----
-
-## ▶️ How to Run
-
-1. Clone the repository:
-   ```
-   git clone https://github.com/wiryaang/expense-tracker-java.git
-   ```
-
-2. Open the project in NetBeans (or any Java IDE)
-
-3. Make sure SQLite JDBC is added to Libraries
-
-4. Run `MainFrame.java`
+```text
+com.expensetracker
+│
+├── model
+│   ├── Expense.java
+│   ├── FoodExpense.java
+│   ├── TransportExpense.java
+│   └── Reportable.java
+│
+├── dao
+│   └── ExpenseDAO.java
+│
+├── service
+│   └── ExpenseService.java
+│
+├── file
+│   └── FileService.java
+│
+├── dc
+│   └── DatabaseConnection.java
+│
+└── ui
+    └── MainFrame.java
+```
 
 ---
 
-## 📌 Current Status
+## Future Improvements
 
-✅ Add / View / Delete expenses  
-✅ Database integration (SQLite)  
-✅ GUI fully functional  
-
-🚧 Planned Features:
-- Monthly expense summary
-- Category breakdown
-- Total spending display
-- UI improvements
+- Monthly analytics dashboard
+- Charts and spending visualization
+- Budget planning system
+- Expense editing feature
+- More detailed reports
 
 ---
 
-## 📸 Preview
+## Author
 
-*(Add screenshots here later)*
-
----
-
-## 💡 Future Improvements
-
-- Charts (expense visualization)
-- Export data to CSV
-- Filter by date range
-- Better UI/UX
-
----
-
-## 👤 Author
-
-Wirya Angana  
-https://github.com/wiryaang
+Wirya Angana
