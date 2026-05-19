@@ -8,7 +8,7 @@ package com.expensetracker.model;
  *
  * @author Wirya Angana
  */
-public class Expense {
+public class Expense implements Reportable {
     private int id;
     private double amount;
     private String category;
@@ -36,6 +36,10 @@ public class Expense {
      }
     public String getNote(){
         return note;
+    }
+    @Override
+    public String generateReport(){
+        return"Expense: Rp "+amount+" | Category: "+category+" | Date: "+date;
     }
 }
      

@@ -7,14 +7,13 @@ import javax.swing.table.DefaultTableModel;
 import java.util.List;
 import com.expensetracker.model.Expense;
 import com.expensetracker.service.ExpenseService;
-import com.expensetracker.dao.ExpenseDAO;
 public class MainFrame extends javax.swing.JFrame {
 
-private ExpenseDAO dao = new ExpenseDAO();
+private ExpenseService service = new ExpenseService();
 private DefaultTableModel tableModel;
     public MainFrame() {
         initComponents();
-        dao.createTableIfNotExists();
+        service.createTableIfNotExists();
     tableModel = new DefaultTableModel(
     new String[]{"ID", "Amount", "Category", "Date", "Note"},0
     );
@@ -25,7 +24,7 @@ private DefaultTableModel tableModel;
 private void loadExpenses(){
     tableModel.setRowCount(0);
         double total = 0;
-    for (Expense e: dao.getAllExpenses()){
+    for (Expense e: service.getAllExpenses()){
         tableModel.addRow(new Object[]{
             e.getId(),
             e.getAmount(),
@@ -171,43 +170,43 @@ private void loadExpenses(){
     }//GEN-LAST:event_FilterActionPerformed
 
     private void AddExpenseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_AddExpenseActionPerformed
-    double amount = Double.parseDouble(Amount.getText());
+ try {
+    double amount = Double.parseDouble(Amount.getText());    
     String category = Category.getText();
     String date = Date.getText();
     String note = Note.getText();
 
-    dao.addExpense(amount,category,date,note);
+    service.addExpense(amount,category,date,note);
     loadExpenses();
 
     Amount.setText("");
     Category.setText("");
     Date.setText("");
     Note.setText("");
+ }
+ catch(NumberFormatException e){
+     javax.swing.JOptionPane.showMessageDialog(
+     this,
+     "Please enter a valid amount."
+     );
+ }
     }//GEN-LAST:event_AddExpenseActionPerformed
 
     private void ApplyActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ApplyActionPerformed
         String keyword = Filter.getText().toLowerCase();
-        
         tableModel.setRowCount(0);
         double total = 0;
-        for (Expense e : dao.getAllExpenses()){
-            String date = e.getDate().toLowerCase().trim();
-            String category = e.getCategory().toLowerCase();
-            String yearMonth = "";
-            if(date.length()>=7){
-              yearMonth = date.substring(0,7);
-            }
-            if(yearMonth.equals(keyword)||category.contains(keyword)|| date.contains(keyword)){
-                tableModel.addRow(new Object[]{
-                    e.getId(),
-                    e.getAmount(),
-                    e.getCategory(),
-                    e.getDate(),
-                    e.getNote()
-                });
-                total += e.getAmount();
-                }
-            }
+        List<Expense> results = service.searchExpenses(keyword);
+        for(Expense e:results){
+            tableModel.addRow(new Object[]{
+                e.getId(),
+                e.getAmount(),
+                e.getCategory(),
+                e.getDate(),
+                e.getNote()
+            });
+            total += e.getAmount();
+        }
         lblTotal.setText("Total: Rp "+ total);
     }//GEN-LAST:event_ApplyActionPerformed
 
@@ -217,8 +216,7 @@ private void loadExpenses(){
     }//GEN-LAST:event_ResetActionPerformed
 
     private void SortByAmountActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_SortByAmountActionPerformed
-        List<Expense> expenses = dao.getAllExpenses();
-        expenses.sort((e1, e2)-> Double.compare(e1.getAmount(),e2.getAmount()));
+        List<Expense> expenses = service.sortByAmount();
         tableModel.setRowCount(0);
         for(Expense e:expenses){
             tableModel.addRow(new Object[]{

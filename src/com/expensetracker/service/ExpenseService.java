@@ -5,7 +5,7 @@
 package com.expensetracker.service;
 import com.expensetracker.model.Expense;
 import com.expensetracker.dc.DatabaseConnection;
-
+import com.expensetracker.dao.ExpenseDAO;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -13,61 +13,26 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class ExpenseService {
+    private ExpenseDAO dao = new ExpenseDAO();
+    public void createTableIfNotExists(){
+        dao.createTableIfNotExists();
+    }
     public void addExpense(double amount, String category, String date, String note){
-        String sql = "INSERT INTO expenses(amount, category, date, note) VALUES(?,?,?,?)";
-        
-        try(Connection conn = DatabaseConnection.connect();
-                PreparedStatement pstmt = conn.prepareStatement(sql)){
-            pstmt.setDouble(1, amount);
-            pstmt.setString(2, category);
-            pstmt.setString(3, date);
-            pstmt.setString(4, note);
-            pstmt.executeUpdate();
-        } catch (Exception e){
-            e.printStackTrace();
-        }
+        dao.addExpense(amount,category,date,note);
         }
     public List<Expense> getAllExpenses(){
-        List<Expense> expenses = new ArrayList<>();
-        String sql = "SELECT * FROM expenses";
-        
-        try (Connection conn = DatabaseConnection.connect();
-            PreparedStatement pstmt = conn.prepareStatement(sql);
-            ResultSet rs = pstmt.executeQuery()) {
-             
-            while(rs.next()){
-                Expense e = new Expense(
-                rs.getInt("id"),
-                rs.getDouble("amount"),
-                rs.getString("category"), 
-                rs.getString("date"),
-                rs.getString("note")
-            );
-                expenses.add(e);
+        return dao.getAllExpenses();
             }
-            }catch(Exception e){
-                e.printStackTrace();
-            }
-        return expenses;
-            }
-    
+
     public void deleteExpense(int id){
-        String sql = "DELETE FROM expenses WHERE id = ?";
-        try (Connection conn = DatabaseConnection.connect();
-            PreparedStatement pstmt = conn.prepareStatement(sql)){
-            
-            pstmt.setInt(1, id);
-            pstmt.executeUpdate();
-        } catch (Exception e){
-            e.printStackTrace();
-}
+        dao.deleteExpense(id);
 }
     public double getTotalExpenses(){
         String sql = "SELECT SUM(amount) as total FROM expenses";
         try(Connection conn = DatabaseConnection.connect();
            PreparedStatement pstmt = conn.prepareStatement(sql);
            ResultSet rs = pstmt.executeQuery()){
-            
+
             if (rs.next()){
                 return rs.getDouble("total");
             }
@@ -79,11 +44,11 @@ public class ExpenseService {
     public Map<String, Double> getTotalByCategory(){
         Map<String, Double> categoryTotals = new HashMap<>();
         String sql = "SELECT category, SUM(amount) as total FROM expenses GROUP BY category";
-        
+
         try(Connection conn = DatabaseConnection.connect();
            PreparedStatement pstmt = conn.prepareStatement(sql);
            ResultSet rs = pstmt.executeQuery()){
-            
+
            while(rs.next()){
                categoryTotals.put(
                     rs.getString("category"),
@@ -95,9 +60,40 @@ public class ExpenseService {
            }
         return categoryTotals;
         }
+    public List<Expense> searchExpenses(String keyword){
+        List<Expense> results = new ArrayList<>();
+        keyword = keyword.toLowerCase().trim();
+        for(Expense e :dao.getAllExpenses()){
+            String category = e.getCategory().toLowerCase();
+            String date = e.getDate().toLowerCase().trim();
+            
+            String yearMonth = "";
+            if(date.length()>=7){
+                yearMonth = date.substring(0,7);
+            }
+            if(yearMonth.equals(keyword)||category.contains(keyword)||date.contains(keyword)){
+                results.add(e);
+            }
+        }
+        return results;
     }
-        
-   
+    public List<Expense> sortByAmount(){
+        List<Expense> list = dao.getAllExpenses();
+        for(int i = 1; i<list.size(); i++){
+            Expense key = list.get(i);
+            int j= i - 1;
+            while (j >= 0 &&
+                list.get(j).getAmount()>key.getAmount()){
+            list.set(j+1,list.get(j));
+            j--;
+            }
+            list.set(j+1,key);
+        }
+        return list;
+    }
+    }
 
 
-      
+
+
+
